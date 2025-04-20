@@ -69,7 +69,9 @@ public class GuestController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Guest not found with the provided card ID"
+                    description = "Guest not found with the provided card ID",
+                    // TODO add 404 sample response
+                    content = @Content
             )
     })
     public ResponseEntity<PendingParcelsResponse> getPendingParcelsByCardId(
