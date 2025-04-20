@@ -1,3 +1,4 @@
+-- Init data for guest
 INSERT INTO guest (card_id, name, is_checked_in, checked_in_date_time, is_checked_out, checked_out_date_time)
 VALUES
 ('C2001', 'Guest Name 1', TRUE, TIMESTAMP '2024-05-20 10:01:00', FALSE, NULL),
@@ -20,3 +21,16 @@ VALUES
 ('C2018', 'Guest Name 18', TRUE, TIMESTAMP '2024-05-20 11:37:00', FALSE, NULL),
 ('C2019', 'Guest Name 19', TRUE, TIMESTAMP '2024-05-20 11:38:00', TRUE, TIMESTAMP '2024-05-21 10:38:00'),
 ('C2020', 'Guest Name 20', TRUE, TIMESTAMP '2024-05-20 11:39:00', FALSE, NULL);
+
+-- Init data for parcel
+INSERT INTO parcel (guest_id, description, is_picked_up) VALUES
+(1,  'Parcel for Guest 1 - Delivered at 2024-05-21 08:01:00', FALSE),
+(2,  'Parcel for Guest 2 - Delivered at 2024-05-21 08:02:00', FALSE),
+(3,  'Parcel for Guest 3 - Delivered at 2024-05-21 08:03:00', FALSE),
+(4,  'Parcel for Guest 4 - Delivered at 2024-05-21 08:04:00', FALSE),
+(5,  'Parcel for Guest 5 - Delivered at 2024-05-21 08:05:00', TRUE),
+(6,  'Parcel for Guest 6 - Delivered at 2024-05-21 08:06:00', TRUE),
+(7,  'Parcel for Guest 7 - Delivered at 2024-05-21 08:07:00', TRUE),
+(8,  'Parcel for Guest 8 - Delivered at 2024-05-21 08:08:00', FALSE),
+(9,  'Parcel for Guest 9 - Delivered at 2024-05-21 08:09:00', FALSE),
+(10, 'Parcel for Guest 10 - Delivered at 2024-05-21 08:10:00', FALSE);

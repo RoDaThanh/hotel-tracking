@@ -1,5 +1,6 @@
 package com.hotel.tracking.controller;
 
+import com.hotel.tracking.dto.response.PendingParcelsResponse;
 import com.hotel.tracking.exception.ErrorResponse;
 import com.hotel.tracking.model.Guest;
 import com.hotel.tracking.service.GuestService;
@@ -8,12 +9,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -54,6 +54,29 @@ public class GuestController {
     ) {
         List<Guest> guests = guestService.getPresentGuests(pageNumber, pageSize);
         return ResponseEntity.ok(guests);
+    }
+
+    @GetMapping("/{cardId}/parcels/pending")
+    @Operation(
+            summary = "Get Pending Parcels by Guest Card ID",
+            description = "Returns a list of parcels that have not been picked up yet for the specified guest."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved list of pending parcels",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PendingParcelsResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Guest not found with the provided card ID"
+            )
+    })
+    public ResponseEntity<PendingParcelsResponse> getPendingParcelsByCardId(
+            @Parameter(description = "The card ID of the guest", example = "C2017", required = true)
+            @PathVariable String cardId) {
+        PendingParcelsResponse response = guestService.getPendingParcelsByCardId(cardId);
+        return ResponseEntity.ok(response);
     }
 
 }

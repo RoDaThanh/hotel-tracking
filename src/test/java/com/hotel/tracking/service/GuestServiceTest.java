@@ -1,7 +1,10 @@
 package com.hotel.tracking.service;
 
+import com.hotel.tracking.dto.response.PendingParcelsResponse;
 import com.hotel.tracking.exception.BadInputPageNumberOrPageSizeException;
+import com.hotel.tracking.exception.GuestNotFoundException;
 import com.hotel.tracking.model.Guest;
+import com.hotel.tracking.model.Parcel;
 import com.hotel.tracking.repository.GuestRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.SliceImpl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -21,11 +25,13 @@ public class GuestServiceTest {
 
     private GuestRepo guestRepo;
     private GuestService guestService;
+    private ParcelService parcelService;
 
     @BeforeEach
     void setUp() {
         guestRepo = mock(GuestRepo.class);
-        guestService = new GuestService(guestRepo);
+        parcelService = mock(ParcelService.class);
+        guestService = new GuestService(guestRepo, parcelService);
     }
 
     @Test
@@ -117,5 +123,49 @@ public class GuestServiceTest {
         } catch (BadInputPageNumberOrPageSizeException e) {
             assertEquals("Invalid page number or page size", e.getMessage());
         }
+    }
+
+    @Test
+    void getPendingParcelsByCardId_shouldReturnResponse_whenGuestHasParcels() {
+        // setup
+        String cardId = "CARD123";
+        Guest guest = new Guest();
+        guest.setId(1L);
+        guest.setName("John Doe");
+
+        Parcel parcel1 = new Parcel(100L, "Laptop", false, guest);
+        Parcel parcel2 = new Parcel(101L, "Bag", false, guest);
+
+        when(guestRepo.findByCardId(cardId)).thenReturn(Optional.of(guest));
+        when(parcelService.findPendingParcel(1L)).thenReturn(List.of(parcel1, parcel2));
+
+        // execute
+        PendingParcelsResponse response = guestService.getPendingParcelsByCardId(cardId);
+
+        // assert
+        assertEquals("John Doe", response.getGuestName());
+        assertEquals(2, response.getPendingParcels().size());
+
+        verify(guestRepo).findByCardId(cardId);
+        verify(parcelService).findPendingParcel(1L);
+    }
+
+    @Test
+    void getPendingParcelsByCardId_shouldThrowException_whenGuestNotFound() {
+        // setup
+        String cardId = "INVALID_CARD";
+
+        when(guestRepo.findByCardId(cardId)).thenReturn(Optional.empty());
+
+        // execute & assert
+        try {
+            guestService.getPendingParcelsByCardId(cardId);
+            fail("Expected GuestNotFoundException to be thrown");
+        } catch (GuestNotFoundException e) {
+            assertEquals("Guest not found", e.getMessage());
+        }
+
+        verify(guestRepo).findByCardId(cardId);
+        verifyNoInteractions(parcelService);
     }
 }
